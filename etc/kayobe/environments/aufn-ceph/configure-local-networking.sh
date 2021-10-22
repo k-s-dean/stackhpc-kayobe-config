@@ -25,6 +25,10 @@ forwarded_ports="80 6080"
 # IP of the seed hypervisor on the OpenStack 'public' network created by init-runonce.sh.
 public_ip="10.0.2.1"
 
+cat << EOF | sudo tee -a /etc/hosts
+10.205.3.187 pulp-server pulp-server.internal.sms-cloud
+EOF
+
 # Install iptables.
 if $(which dnf >/dev/null 2>&1); then
     sudo dnf -y install iptables
@@ -60,6 +64,9 @@ done
 # route via this route to the outside world.
 sudo iptables -A POSTROUTING -t nat -o $iface -j MASQUERADE
 sudo sysctl -w net.ipv4.conf.all.forwarding=1
+
+# FIXME: IP MASQUERADE from control plane fails without this.
+echo 0 | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
 
 # Configure port forwarding from the hypervisor to the Horizon GUI on the
 # controller.
