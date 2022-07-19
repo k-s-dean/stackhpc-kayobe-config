@@ -19,6 +19,10 @@ resolv_nameservers:
 # Using a Pulp container on the seed-hypervisor.
 seed_pulp_container_enabled: false
 
+# Seed container running a Squid caching proxy. This can be used to proxy
+# HTTP(S) requests from control plane hosts.
+seed_squid_container_enabled: true
+
 ###############################################################################
 # StackHPC configuration.
 
