@@ -4,6 +4,7 @@
 
 provision_oc_interface: "{{ 'ens2' if os_distribution == 'ubuntu' else 'eth0' }}"
 # Route via the seed-hypervisor to the outside world.
+# FIXME: Should use public network
 provision_oc_gateway: 192.168.33.4
 
 mgmt_interface: "{{ 'ens3' if os_distribution == 'ubuntu' else 'eth1' }}"
