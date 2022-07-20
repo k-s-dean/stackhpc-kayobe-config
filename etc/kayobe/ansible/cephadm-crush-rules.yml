@@ -1,0 +1,8 @@
+---
+- name: Define Ceph CRUSH rules
+  gather_facts: false
+  hosts: mons
+  become: true
+  tasks:
+    - import_role:
+        name: stackhpc.cephadm.crush_rules

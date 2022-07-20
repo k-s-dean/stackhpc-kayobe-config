@@ -1,0 +1,8 @@
+---
+- name: Define Ceph EC profiles
+  gather_facts: false
+  hosts: mons
+  become: true
+  tasks:
+    - import_role:
+        name: stackhpc.cephadm.ec_profiles

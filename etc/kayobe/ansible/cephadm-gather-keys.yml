@@ -1,0 +1,71 @@
+---
+- name: Gather Ceph keys and populate kayobe-config
+  gather_facts: false
+  hosts: mons
+  run_once: true
+  vars:
+    ceph_keys:
+      - name: client.glance
+        dests:
+          - glance
+        required: "{{ ceph_glance_key_required | bool }}"
+      - name: client.cinder
+        dests:
+          - cinder/cinder-volume
+          - cinder/cinder-backup
+          - nova
+        required: "{{ ceph_cinder_key_required | bool }}"
+      - name: client.cinder-backup
+        dests:
+          - cinder/cinder-backup
+        required: "{{ ceph_cinder_backup_key_required | bool }}"
+    ceph_glance_key_required: "{{ kolla_enable_glance | bool }}"
+    ceph_cinder_key_required: "{{ kolla_enable_cinder | bool }}"
+    ceph_cinder_backup_key_required: "{{ kolla_enable_cinder_backup | bool }}"
+  tasks:
+    - name: Get Ceph keys
+      stackhpc.cephadm.cephadm_key:
+        name: "{{ item.name }}"
+        state: info
+      register: cephadm_keys
+      become: true
+      loop: "{{ ceph_keys | selectattr('required') }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Generate ceph.conf
+      command: "cephadm shell -- ceph config generate-minimal-conf"
+      become: true
+      register: cephadm_ceph_conf
+
+    - name: Ensure Kolla config directories are present
+      file:
+        state: directory
+        path: "{{ kayobe_env_config_path }}/kolla/config/{{ item.dest }}"
+      loop: "{{ ceph_keys | selectattr('required') }}"
+      loop_control:
+        label: "{{ item.name }}"
+      delegate_to: localhost
+
+    - name: Save keys to proper locations
+      vars:
+        cephadm_key: "{{ (item.stdout | from_json | first)['key'] }}"
+        cephadm_user: "{{ (item.stdout | from_json | first)['entity'] }}"
+      copy:
+        content: "{{ cephadm_key }}"
+        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ item.item.dest }}/ceph.{{ cephadm_user }}.keyring"
+      loop: "{{ cephadm_keys.results }}"
+      loop_control:
+        label: "{{ cephadm_user }}"
+      delegate_to: localhost
+
+    - name: Save ceph.conf to proper locations
+      copy:
+        content: "{{ cephadm_ceph_conf.stdout }}"
+        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ item.dest }}/ceph.conf"
+      loop: "{{ ceph_keys | selectattr('required') }}"
+      delegate_to: localhost
+
+    - name: Please add and commit the Ceph configuration
+      debug:
+        msg: Please add and commit the Ceph configuration files and keys
