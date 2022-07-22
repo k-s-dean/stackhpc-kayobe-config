@@ -123,6 +123,7 @@ public_allocation_pool_end: 192.168.39.254
 public_vip_address: 192.168.39.2
 public_vlan: 103
 public_physical_network: cloud
+public_zone: public
 
 tunnel_cidr: 192.168.40.0/24
 tunnel_mtu: 1450

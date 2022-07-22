@@ -28,3 +28,5 @@ prometheus_libvirt_exporter_tag: wallaby-20220325T122042
 prometheus_msteams_tag: wallaby-20220119T122428
 prometheus_openstack_exporter_tag: wallaby-20220705T132206
 {% endif %}
+
+enable_external_api_firewalld: true
