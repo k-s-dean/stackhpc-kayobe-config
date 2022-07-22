@@ -1,0 +1,36 @@
+# TODO: Move to Kayobe?
+# Do we need this? Move sysctls to controllers.yml etc, move mount to LVM
+---
+- hosts: overcloud
+  vars:
+    swap_device: "/dev/rootvg/lv_swap"
+    # For interpretation of these values, see:
+    # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-configuration_tools-configuring_system_memory_capacity
+    sysctl_config:
+      vm.swappiness: 75
+      vm.overcommit_ratio: 100
+      vm.overcommit_memory: 2
+  become: true
+  tasks:
+    - name: Ensure swap device present in fstab
+      mount:
+        name: "none"
+        src: "{{ swap_device }}"
+        fstype: "swap"
+        state: "present"
+
+    # It does no harm to run this when swap is already active
+    - name: Enable swap devices
+      command: "/sbin/swapon -a"
+      when:
+        - ansible_swaptotal_mb == 0
+
+    - name: Adjust memory overcommit/swap configuration parameters
+      sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        sysctl_set: yes
+        state: present
+        reload: yes
+        ignoreerrors: yes
+      with_dict: "{{ sysctl_config }}"
