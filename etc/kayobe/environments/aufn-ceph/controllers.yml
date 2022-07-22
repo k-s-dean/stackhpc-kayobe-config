@@ -1,0 +1,30 @@
+---
+###############################################################################
+# Controller node LVM configuration.
+
+# List of controller volume groups. See mrlesmithjr.manage-lvm role for
+# format.
+controller_lvm_groups:
+  - vgname: rootvg
+    disks:
+      - /dev/disk/by-partlabel/root
+    create: true
+    lvnames:
+      - lvname: lv_swap
+        size: 16g
+        create: true
+        filesystem: swap
+        mount: true
+        mntp: "none"
+  - vgname: datavg
+    disks: TODO
+      #- /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+      #- /dev/disk/by-path/pci-0000:45:00.0-nvme-1
+    create: true
+    lvnames:
+      - lvname: lv_docker
+        size: 100%FREE
+        create: true
+        filesystem: ext4
+        mount: true
+        mntp: /var/lib/docker

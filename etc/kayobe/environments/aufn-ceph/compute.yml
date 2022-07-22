@@ -1,10 +1,10 @@
 ---
 ###############################################################################
-# Storage node LVM configuration.
+# Compute node LVM configuration.
 
-# List of storage volume groups. See mrlesmithjr.manage-lvm role for
+# List of compute volume groups. See mrlesmithjr.manage-lvm role for
 # format.
-storage_lvm_groups:
+compute_lvm_groups:
   - vgname: rootvg
     disks:
       - /dev/disk/by-partlabel/root
@@ -34,6 +34,17 @@ storage_lvm_groups:
         filesystem: ext4
         mount: true
         mntp: /var/log/audit
+      - lvname: lv_home
+        size: 10g
+        create: true
+        filesystem: ext4
+        mount: true
+        mntp: /home
+  - vgname: datavg
+    disks: TODO
+      #- /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+    create: true
+    lvnames:
       - lvname: lv_docker
         size: 100%FREE
         create: true
