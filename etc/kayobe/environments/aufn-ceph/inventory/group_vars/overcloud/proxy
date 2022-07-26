@@ -1,7 +1,7 @@
 ---
 # HTTP proxy URL (format: http(s)://[user:password@]proxy_name:port). By
 # default no proxy is used.
-http_proxy: "{{ admin_oc_net_name | net_ip(inventory_hostname=groups['seed'][0]) }}:3128"
+http_proxy: "http://{{ admin_oc_net_name | net_ip(inventory_hostname=groups['seed'][0]) }}:3128"
 
 # HTTPS proxy URL (format: http(s)://[user:password@]proxy_name:port). By
 # default no proxy is used.

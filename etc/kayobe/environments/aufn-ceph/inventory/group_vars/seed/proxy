@@ -1,11 +1,11 @@
 ---
 # HTTP proxy URL (format: http(s)://[user:password@]proxy_name:port). By
 # default no proxy is used.
-http_proxy: "{{ admin_oc_net_name | net_ip(inventory_hostname=groups['seed'][0]) }}"
+http_proxy: "http://{{ admin_oc_net_name | net_ip(inventory_hostname=groups['seed'][0]) }}"
 
 # HTTPS proxy URL (format: http(s)://[user:password@]proxy_name:port). By
 # default no proxy is used.
-https_proxy: "{{ admin_oc_net_name | net_ip(inventory_hostname=groups['seed'][0]) }}"
+https_proxy: "http://{{ admin_oc_net_name | net_ip(inventory_hostname=groups['seed'][0]) }}"
 
 # List of domains, hostnames, IP addresses and networks for which no proxy is
 # used. Defaults to ["127.0.0.1", "localhost", "{{ ('http://' ~
