@@ -87,3 +87,5 @@ bridge_type: linuxbridge
 
 # No placement service.
 wait_for_placement: false
+
+default_boot_mode: uefi
