@@ -2,6 +2,12 @@
 ###############################################################################
 # Compute node LVM configuration.
 
+compute_lvm_lv_swap_size: 128m
+compute_lvm_lv_var_size: 2g
+compute_lvm_lv_log_size: 2g
+compute_lvm_lv_audit_size: 256m
+compute_lvm_lv_home_size: 256m
+
 # List of compute volume groups. See mrlesmithjr.manage-lvm role for
 # format.
 compute_lvm_groups:
@@ -11,40 +17,40 @@ compute_lvm_groups:
     create: true
     lvnames:
       - lvname: lv_swap
-        size: 16g
+        size: "{{ compute_lvm_lv_swap_size }}"
         create: true
-        filesystem: swap
-        mount: true
-        mntp: "none"
+        # Mount fails because state=mounted.(need state=present)
+        mount: false
       - lvname: lv_var
-        size: 20g
+        size: "{{ compute_lvm_lv_var_size }}"
         create: true
         filesystem: ext4
         mount: true
         mntp: /var
-      - lvname: lv_var_log
-        size: 20g
+      - lvname: lv_log
+        size: "{{ compute_lvm_lv_log_size }}"
         create: true
         filesystem: ext4
         mount: true
         mntp: /var/log
-      - lvname: lv_var_log_audit
-        size: 10g
+      - lvname: lv_audit
+        size: "{{ compute_lvm_lv_audit_size }}"
         create: true
         filesystem: ext4
         mount: true
         mntp: /var/log/audit
       - lvname: lv_home
-        size: 10g
+        size: "{{ compute_lvm_lv_home_size }}"
         create: true
         filesystem: ext4
         mount: true
         mntp: /home
-  - vgname: datavg
-    disks: TODO
-      #- /dev/disk/by-path/pci-0000:44:00.0-nvme-1
-    create: true
-    lvnames:
+#  - vgname: datavg
+#    disks: TODO
+#      #- /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+#    create: true
+#    lvnames:
+#     # NOTE: Using rootvg in AUFN
       - lvname: lv_docker
         size: 100%FREE
         create: true
