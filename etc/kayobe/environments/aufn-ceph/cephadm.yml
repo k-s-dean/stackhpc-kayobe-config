@@ -1,9 +1,17 @@
 ---
-# Networking
+cephadm_ceph_release: "pacific"
+cephadm_fsid: aca8bc7c-0681-11ed-bf31-2f6d524e4a7a
+cephadm_image: "{{ stackhpc_docker_registry }}/ceph/ceph:v16.2.5"
+cephadm_registry_url: "{{ stackhpc_docker_registry }}"
+cephadm_registry_username: "{{ stackhpc_docker_registry_username }}"
+cephadm_registry_password: "{{ stackhpc_docker_registry_password }}"
 cephadm_public_interface: "{{ storage_net_name | net_interface }}"
 cephadm_public_network: "{{ storage_net_name | net_cidr }}"
 cephadm_cluster_interface: "{{ storage_mgmt_net_name | net_interface }}"
 cephadm_cluster_network: "{{ storage_mgmt_net_name | net_cidr }}"
+# TODO: firewalld?
+cephadm_enable_firewalld: false
+
 # OSDs
 cephadm_osd_spec:
   service_type: osd
@@ -12,3 +20,126 @@ cephadm_osd_spec:
     host_pattern: "*"
   data_devices:
     all: true
+  encrypted: true
+
+#cephadm_osd_spec: |
+#  ---
+#  service_type: osd
+#  service_id: osd-ssd
+#  placement:
+#    host_pattern: '*'
+#  data_devices:
+#    # ceph-volume inventory </path/to/disk>
+#    rotational: 0
+#    model: TODO
+#    limit: 2
+#  encrypted: true
+#  ---
+#  service_type: osd
+#  service_id: osd-hdd
+#  placement:
+#    host_pattern: '*'
+#  data_devices:
+#    # ceph-volume inventory </path/to/disk>
+#    rotational: 1
+#    model: TODO
+#    size: "12T:"
+#  db_devices:
+#    # ceph-volume inventory </path/to/disk>
+#    rotational: 0
+#    model: TODO
+#    size: ":4T"
+#    limit: 1
+#  # Is it necessary?
+#  #db_slots: 4
+#  encrypted: true
+
+#cephadm_ec_profiles: []
+
+#cephadm_crush_rules: []
+
+#cephadm_pools: []
+
+#cephadm_keys: []
+
+cephadm_ec_profiles:
+  - name: ec_4_2_hdd
+    k: 4
+    m: 2
+    crush_device_class: hdd
+
+cephadm_crush_rules:
+  - name: replicated_hdd
+    bucket_root: default
+    bucket_type: host
+    device_class: hdd
+    rule_type: replicated
+    state: present
+#  - name: replicated_ssd
+#    bucket_root: default
+#    bucket_type: host
+#    device_class: ssd
+#    rule_type: replicated
+#    state: present
+  - name: ec_hdd
+    rule_type: erasure
+    profile: ec_4_2_hdd
+    state: present
+
+cephadm_pools:
+  - name: volumes
+    application: rbd
+    pool_type: replicated
+    rule_name: replicated_hdd
+    state: present
+  - name: images
+    application: rbd
+    pool_type: replicated
+    rule_name: replicated_hdd
+    state: present
+  - name: vms
+    application: rbd
+    pool_type: replicated
+    rule_name: replicated_hdd
+    state: present
+  - name: ec-ephemeral
+    application: rbd
+    pool_type: erasure
+    erasure_profile: ec_4_2_hdd
+    rule_name: ec_hdd
+    allow_ec_overwrites: true
+    state: present
+#  - name: flash-ephemeral-meta
+#    application: rbd
+#    pool_type: replicated
+#    rule_name: replicated_ssd
+#    state: present
+#  - name: flash-volumes
+#    application: rbd
+#    pool_type: erasure
+#    erasure_profile: ec_4_2_ssd
+#    rule_name: ec_ssd
+#    allow_ec_overwrites: true
+#    state: present
+#  - name: flash-volumes-meta
+#    application: rbd
+#    pool_type: replicated
+#    rule_name: replicated_ssd
+#    state: present
+
+cephadm_keys:
+  - name: client.glance
+    caps:
+      mon: "profile rbd"
+      osd: "profile rbd pool=images"
+      mgr: "profile rbd pool=images"
+    state: present
+  - name: client.cinder
+    caps:
+      mon: "profile rbd"
+      osd: "profile rbd pool=volumes, profile rbd pool=vms, profile rbd-read-only pool=images"
+      mgr: "profile rbd pool=volumes, profile rbd pool=vms"
+#  - name: client.manila
+#    caps:
+#      mon: "allow r"
+#      mgr: "allow rw"
