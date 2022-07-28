@@ -2,63 +2,73 @@
 ###############################################################################
 # Compute node LVM configuration.
 
-compute_lvm_lv_swap_size: 128m
-compute_lvm_lv_var_size: 2g
-compute_lvm_lv_log_size: 2g
-compute_lvm_lv_audit_size: 256m
-compute_lvm_lv_home_size: 256m
+# FIXME: Where to put these?
+stackhpc_lvm_lv_swap_size: 128m
+stackhpc_lvm_lv_root_size: 5g
+stackhpc_lvm_lv_tmp_size: 1g
+stackhpc_lvm_lv_var_size: 2g
+stackhpc_lvm_lv_var_tmp_size: 1g
+stackhpc_lvm_lv_log_size: 2g
+stackhpc_lvm_lv_audit_size: 256m
+stackhpc_lvm_lv_home_size: 256m
+stackhpc_lvm_lv_docker_size: 100%FREE
 
 # List of compute volume groups. See mrlesmithjr.manage-lvm role for
 # format.
 compute_lvm_groups:
-  - vgname: rootvg
-    disks:
-      - /dev/disk/by-partlabel/root
-    create: true
-    lvnames:
-      - lvname: lv_swap
-        size: "{{ compute_lvm_lv_swap_size }}"
-        create: true
-        # Mount fails because state=mounted.(need state=present)
-        mount: false
-      - lvname: lv_var
-        size: "{{ compute_lvm_lv_var_size }}"
-        create: true
-        filesystem: ext4
-        mount: true
-        mntp: /var
-      - lvname: lv_log
-        size: "{{ compute_lvm_lv_log_size }}"
-        create: true
-        filesystem: ext4
-        mount: true
-        mntp: /var/log
-      - lvname: lv_audit
-        size: "{{ compute_lvm_lv_audit_size }}"
-        create: true
-        filesystem: ext4
-        mount: true
-        mntp: /var/log/audit
-      - lvname: lv_home
-        size: "{{ compute_lvm_lv_home_size }}"
-        create: true
-        filesystem: ext4
-        mount: true
-        mntp: /home
-#  - vgname: datavg
-#    disks: TODO
-#      #- /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+  - "{{ stackhpc_lvm_group_rootvg }}"
+
+stackhpc_lvm_group_rootvg_lvs_extra:
+  - "{{ stackhpc_lvm_lv_docker }}"
+
+#  - vgname: rootvg
+#    disks:
+#      - /dev/disk/by-partlabel/root
 #    create: true
 #    lvnames:
-#     # NOTE: Using rootvg in AUFN
-      - lvname: lv_docker
-        size: 100%FREE
-        create: true
-        filesystem: ext4
-        mount: true
-        mntp: /var/lib/docker
-
-###############################################################################
+#      - lvname: lv_swap
+#        size: "{{ compute_lvm_lv_swap_size }}"
+#        create: true
+#        # Mount fails because state=mounted.(need state=present)
+#        mount: false
+#      - lvname: lv_var
+#        size: "{{ compute_lvm_lv_var_size }}"
+#        create: true
+#        filesystem: ext4
+#        mount: true
+#        mntp: /var
+#      - lvname: lv_log
+#        size: "{{ compute_lvm_lv_log_size }}"
+#        create: true
+#        filesystem: ext4
+#        mount: true
+#        mntp: /var/log
+#      - lvname: lv_audit
+#        size: "{{ compute_lvm_lv_audit_size }}"
+#        create: true
+#        filesystem: ext4
+#        mount: true
+#        mntp: /var/log/audit
+#      - lvname: lv_home
+#        size: "{{ compute_lvm_lv_home_size }}"
+#        create: true
+#        filesystem: ext4
+#        mount: true
+#        mntp: /home
+##  - vgname: datavg
+##    disks: TODO
+##      #- /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+##    create: true
+##    lvnames:
+##     # NOTE: Using rootvg in AUFN
+#      - lvname: lv_docker
+#        size: 100%FREE
+#        create: true
+#        filesystem: ext4
+#        mount: true
+#        mntp: /var/lib/docker
+#
+################################################################################
 # Compute node sysctl configuration.
 
 # Dict of sysctl parameters to set.
