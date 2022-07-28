@@ -1,71 +1,84 @@
 ---
-- name: Gather Ceph keys and populate kayobe-config
+- name: Gather Ceph configuration and keys and populate kayobe-config
   gather_facts: false
   hosts: mons
   run_once: true
   vars:
-    ceph_keys:
-      - name: client.glance
-        dests:
-          - glance
-        required: "{{ ceph_glance_key_required | bool }}"
-      - name: client.cinder
-        dests:
-          - cinder/cinder-volume
-          - cinder/cinder-backup
-          - nova
-        required: "{{ ceph_cinder_key_required | bool }}"
-      - name: client.cinder-backup
-        dests:
-          - cinder/cinder-backup
-        required: "{{ ceph_cinder_backup_key_required | bool }}"
-    ceph_glance_key_required: "{{ kolla_enable_glance | bool }}"
-    ceph_cinder_key_required: "{{ kolla_enable_cinder | bool }}"
-    ceph_cinder_backup_key_required: "{{ kolla_enable_cinder_backup | bool }}"
+    # Map from an OpenStack service to the directory in which to store Ceph keys for it.
+    kolla_service_to_key_dir:
+      cinder-backup: cinder/cinder-backup
+      cinder-volume: cinder/cinder-volume
+      glance: glance
+      nova: nova
+    # Map from an OpenStack service to the directory in which to store Ceph configuration for it.
+    kolla_service_to_conf_dir:
+      cinder-backup: cinder
+      cinder-volume: cinder
+      glance: glance
+      nova: nova
   tasks:
     - name: Get Ceph keys
       stackhpc.cephadm.cephadm_key:
         name: "{{ item.name }}"
         state: info
-      register: cephadm_keys
+      register: cephadm_key_info
       become: true
-      loop: "{{ ceph_keys | selectattr('required') }}"
+      loop: "{{ cephadm_keys }}"
       loop_control:
         label: "{{ item.name }}"
+      when: item.state | default != 'absent'
 
     - name: Generate ceph.conf
       command: "cephadm shell -- ceph config generate-minimal-conf"
       become: true
       register: cephadm_ceph_conf
+      changed_when: false
 
     - name: Ensure Kolla config directories are present
       file:
         state: directory
-        path: "{{ kayobe_env_config_path }}/kolla/config/{{ item.dest }}"
-      loop: "{{ ceph_keys | selectattr('required') }}"
+        path: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_key_dir[item.1] }}"
+      loop: "{{ query('subelements', cephadm_keys, 'kolla_services', skip_missing=True) }}"
       loop_control:
-        label: "{{ item.name }}"
+        label:
+          key: "{{ item.0.name }}"
+          service: "{{ item.1 }}"
+      when: item.0.state | default != 'absent'
       delegate_to: localhost
 
-    - name: Save keys to proper locations
+    - name: Save Ceph keys to Kayobe configuration
       vars:
-        cephadm_key: "{{ (item.stdout | from_json | first)['key'] }}"
-        cephadm_user: "{{ (item.stdout | from_json | first)['entity'] }}"
+        key_info: "{{ cephadm_key_info.results | selectattr('item.name', 'equalto', item.0.name) | first }}"
+        cephadm_key: "{{ (key_info.stdout | from_json | first)['key'] }}"
+        cephadm_user: "{{ (key_info.stdout | from_json | first)['entity'] }}"
       copy:
         content: "{{ cephadm_key }}"
-        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ item.item.dest }}/ceph.{{ cephadm_user }}.keyring"
-      loop: "{{ cephadm_keys.results }}"
+        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_key_dir[item.1] }}/ceph.{{ cephadm_user }}.keyring"
+      loop: "{{ query('subelements', cephadm_keys, 'kolla_services', skip_missing=True) }}"
       loop_control:
-        label: "{{ cephadm_user }}"
+        label:
+          key: "{{ item.0.name }}"
+          service: "{{ item.1 }}"
+      when: item.0.state | default != 'absent'
       delegate_to: localhost
+      notify: Please add and commit the Kayobe configuration
 
-    - name: Save ceph.conf to proper locations
+    - name: Save ceph.conf to Kayobe configuration
       copy:
         content: "{{ cephadm_ceph_conf.stdout }}"
-        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ item.dest }}/ceph.conf"
-      loop: "{{ ceph_keys | selectattr('required') }}"
+        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_conf_dir[item.1] }}/ceph.conf"
+      loop: "{{ query('subelements', cephadm_keys, 'kolla_services', skip_missing=True) }}"
+      loop_control:
+        label:
+          key: "{{ item.0.name }}"
+          service: "{{ item.1 }}"
+      when: item.0.state | default != 'absent'
       delegate_to: localhost
+      notify: Please add and commit the Kayobe configuration
 
-    - name: Please add and commit the Ceph configuration
+  handlers:
+    - name: Please add and commit the Kayobe configuration
       debug:
-        msg: Please add and commit the Ceph configuration files and keys
+        msg: >-
+          Please add and commit the Ceph configuration files and keys in Kayobe
+          configuration. Remember to encrypt the keys using Ansible Vault.
