@@ -19,14 +19,11 @@
   tasks:
     - name: Get Ceph keys
       stackhpc.cephadm.cephadm_key:
-        name: "{{ item.name }}"
+        name: "{{ item }}"
         state: info
       register: cephadm_key_info
       become: true
-      loop: "{{ cephadm_keys }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when: item.state | default != 'absent'
+      loop: "{{ kolla_ceph_services | selectattr('required') | map(attribute='keys') | flatten | unique }}"
 
     - name: Generate ceph.conf
       command: "cephadm shell -- ceph config generate-minimal-conf"
@@ -37,42 +34,38 @@
     - name: Ensure Kolla config directories are present
       file:
         state: directory
-        path: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_key_dir[item.1] }}"
-      loop: "{{ query('subelements', cephadm_keys, 'kolla_services', skip_missing=True) }}"
+        path: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_key_dir[item.name] }}"
+      loop: "{{ kolla_ceph_services | selectattr('required') }}"
       loop_control:
         label:
-          key: "{{ item.0.name }}"
-          service: "{{ item.1 }}"
-      when: item.0.state | default != 'absent'
+          service: "{{ item.name }}"
       delegate_to: localhost
 
     - name: Save Ceph keys to Kayobe configuration
       vars:
-        key_info: "{{ cephadm_key_info.results | selectattr('item.name', 'equalto', item.0.name) | first }}"
+        key_info: "{{ cephadm_key_info.results | selectattr('item', 'equalto', item.1) | first }}"
         cephadm_key: "{{ (key_info.stdout | from_json | first)['key'] }}"
         cephadm_user: "{{ (key_info.stdout | from_json | first)['entity'] }}"
       copy:
         content: "{{ cephadm_key }}"
-        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_key_dir[item.1] }}/ceph.{{ cephadm_user }}.keyring"
-      loop: "{{ query('subelements', cephadm_keys, 'kolla_services', skip_missing=True) }}"
+        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_key_dir[item.0.name] }}/ceph.{{ cephadm_user }}.keyring"
+      loop: "{{ query('subelements', kolla_ceph_services | selectattr('required'), 'keys') }}"
       loop_control:
         label:
-          key: "{{ item.0.name }}"
-          service: "{{ item.1 }}"
-      when: item.0.state | default != 'absent'
+          service: "{{ item.0.name }}"
+          key: "{{ item.1 }}"
       delegate_to: localhost
       notify: Please add and commit the Kayobe configuration
 
     - name: Save ceph.conf to Kayobe configuration
       copy:
         content: "{{ cephadm_ceph_conf.stdout }}"
-        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_conf_dir[item.1] }}/ceph.conf"
-      loop: "{{ query('subelements', cephadm_keys, 'kolla_services', skip_missing=True) }}"
+        dest: "{{ kayobe_env_config_path }}/kolla/config/{{ kolla_service_to_conf_dir[item.0.name] }}/ceph.conf"
+      loop: "{{ query('subelements', kolla_ceph_services | selectattr('required'), 'keys') }}"
       loop_control:
         label:
-          key: "{{ item.0.name }}"
-          service: "{{ item.1 }}"
-      when: item.0.state | default != 'absent'
+          service: "{{ item.0.name }}"
+          key: "{{ item.1 }}"
       delegate_to: localhost
       notify: Please add and commit the Kayobe configuration
 
