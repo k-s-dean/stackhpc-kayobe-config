@@ -1,0 +1,9 @@
+---
+clouds:
+  sms-lab:
+    auth:
+      auth_url: https://api.sms-lab.cloud:5000
+      username: gkoper
+      project_name: stackhpc
+      domain_name: default
+    interface: public
