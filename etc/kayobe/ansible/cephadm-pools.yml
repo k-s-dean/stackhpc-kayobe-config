@@ -3,6 +3,9 @@
   gather_facts: false
   hosts: mons
   become: true
+  tags:
+    - cephadm
+    - cephadm-keys
   tasks:
     - import_role:
         name: stackhpc.cephadm.pools

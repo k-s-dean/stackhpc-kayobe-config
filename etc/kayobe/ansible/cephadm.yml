@@ -1,8 +1,7 @@
 ---
-- name: Deploy Ceph using Cephadm
-  any_errors_fatal: true
-  gather_facts: true
-  hosts: ceph
-  tasks:
-    - import_role:
-        name: stackhpc.cephadm.cephadm
+# Deploy Ceph via Cephadm. Create EC profiles, CRUSH rules, pools and keys.
+- import_playbook: cephadm-deploy.yml
+- import_playbook: cephadm-ec-profiles.yml
+- import_playbook: cephadm-crush-rules.yml
+- import_playbook: cephadm-pools.yml
+- import_playbook: cephadm-keys.yml
