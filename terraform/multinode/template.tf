@@ -10,8 +10,10 @@ resource "local_file" "ansible_inventory" {
       seed = openstack_compute_instance_v2.kayobe-seed.access_ip_v4
       computes = openstack_compute_instance_v2.compute.*.access_ip_v4
       controllers = openstack_compute_instance_v2.controller.*.access_ip_v4
+      cephOSD_hostname = openstack_compute_instance_v2.Ceph-OSD.*.name
+      cephOSDs =  openstack_compute_instance_v2.Ceph-OSD.*.access_ip_v4
     }
- )
+  )
   filename = "ansible_inventory" 
 }
 

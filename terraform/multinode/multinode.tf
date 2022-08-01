@@ -1,3 +1,7 @@
+variable "cephOSD_count" {
+  type    = string
+}
+
 variable "repo_name" {
   type = string
   default = "stackhpc/stackhpc-kayobe-config"
@@ -146,6 +150,19 @@ resource "openstack_compute_instance_v2" "controller" {
   config_drive = true
   user_data    = file("templates/userdata.cfg.tpl")
   count        = var.controller_count
+  network {
+    name = var.seed_vm_network
+  }
+}
+
+resource "openstack_compute_instance_v2" "Ceph-OSD" {
+  name         = format("%s-cephOSD-%02d", var.prefix, count.index +1)
+  flavor_name  = var.multinode_flavor
+  key_pair     = var.multinode_keypair
+  image_name   = var.multinode_image
+  config_drive = true
+  user_data    = file("templates/userdata.cfg.tpl")
+  count        = var.cephOSD_count
   network {
     name = var.seed_vm_network
   }

@@ -6,3 +6,5 @@ kayobe-compute-01 ansible_host=10.0.0.150 ansible_user=centos
 kayobe-controller-01 ansible_host=10.0.1.12 ansible_user=centos
 kayobe-controller-02 ansible_host=10.0.2.44 ansible_user=centos
 kayobe-controller-03 ansible_host=10.0.3.31 ansible_user=centos
+[cephOSDs]
+kayobe-cephOSD-01 ansible_host=10.0.1.80 ansible_user=centos
