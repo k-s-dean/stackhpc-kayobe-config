@@ -1,10 +1,10 @@
 [seed]
-kayobe-seed ansible_host=10.0.2.105 ansible_user=centos
+kayobe-seed ansible_host=10.0.0.229 ansible_user=centos
 [computes]
-kayobe-compute-01 ansible_host=10.0.0.150 ansible_user=centos
+kayobe-compute-01 ansible_host=10.0.0.80 ansible_user=centos
 [controllers]
-kayobe-controller-01 ansible_host=10.0.1.12 ansible_user=centos
-kayobe-controller-02 ansible_host=10.0.2.44 ansible_user=centos
-kayobe-controller-03 ansible_host=10.0.3.31 ansible_user=centos
+kayobe-controller-01 ansible_host=10.0.2.234 ansible_user=centos
+kayobe-controller-02 ansible_host=10.0.2.79 ansible_user=centos
+kayobe-controller-03 ansible_host=10.0.0.43 ansible_user=centos
 [cephOSDs]
-kayobe-cephOSD-01 ansible_host=10.0.1.80 ansible_user=centos
+kayobe-cephOSD-01 ansible_host=10.0.1.36 ansible_user=centos

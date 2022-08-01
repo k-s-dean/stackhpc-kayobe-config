@@ -1,3 +1,7 @@
+variable "owner" {
+  type = string
+  default = "grzegorzkoper"
+}
 variable "cephOSD_count" {
   type    = string
 }

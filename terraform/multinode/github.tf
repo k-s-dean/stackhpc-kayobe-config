@@ -8,7 +8,7 @@ data "github_repository" "repo" {
   full_name = var.repo_name
 }
 resource "github_repository_environment" "multinode_environment" {
-  repository       = data.github_repository.repo.full_name
+  repository       = data.github_repository.repo.name
   environment      = "multinode"
 }
 resource "github_actions_environment_secret" "inventory" {
