@@ -81,6 +81,7 @@ mgmt_cidr: 192.168.35.0/24
 mgmt_mtu: 1450
 # Native VLAN
 mgmt_physical_network: mgmt
+mgmt_zone: mgmt
 
 #admin_cidr: 192.168.34.0/24
 #admin_mtu: 1450
@@ -93,6 +94,7 @@ provision_oc_inspection_allocation_pool_start: 192.168.33.128
 provision_oc_inspection_allocation_pool_end: 192.168.33.254
 # Native VLAN
 provision_oc_physical_network: provision
+provision_oc_zone: provision_oc
 
 provision_wl_cidr: 192.168.36.0/24
 provision_wl_mtu: 1450

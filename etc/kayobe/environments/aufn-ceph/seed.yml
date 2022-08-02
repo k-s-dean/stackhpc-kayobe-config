@@ -1,0 +1,55 @@
+---
+###############################################################################
+# Seed node firewalld configuration.
+
+# Whether to install and enable firewalld.
+seed_firewalld_enabled: true
+
+# A list of zones to create. Each item is a dict containing a 'zone' item.
+seed_firewalld_zones:
+  - zone: admin_external
+  - zone: mgmt
+  - zone: provision_oc
+
+# A firewalld zone to set as the default. Default is unset, in which case the
+# default zone will not be changed.
+seed_firewalld_default_zone: drop
+
+# A list of firewall rules to apply. Each item is a dict containing arguments
+# to pass to the firewalld module. Arguments are omitted if not provided, with
+# the following exceptions:
+# - offline: true
+# - permanent: true
+# - state: enabled
+seed_firewalld_rules:
+  - service: ssh
+    state: enabled
+    zone: provision_oc
+  - service: dhcp
+    state: enabled
+    zone: provision_oc
+  - service: tftp
+    state: enabled
+    zone: provision_oc
+  - service: ntp
+    state: enabled
+    zone: provision_oc
+  # Pulp server
+  - service: http
+    state: enabled
+    zone: provision_oc
+  - service: squid
+    state: enabled
+    zone: provision_oc
+  # Ironic inspector API
+  - port: 5050/tcp
+    state: enabled
+    zone: provision_oc
+  # Ironic API
+  - port: 6385/tcp
+    state: enabled
+    zone: provision_oc
+  # nginx
+  - port: 8080/tcp
+    state: enabled
+    zone: provision_oc
