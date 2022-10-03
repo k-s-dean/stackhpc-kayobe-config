@@ -16,6 +16,7 @@ Centos 8 stream vm
 1. `sudo dnf install -y python3-virtualenv`
 1. `mkdir src` and `cd src`
 1. `git clone https://github.com/stackhpc/stackhpc-kayobe-config.git`
+1. `cd stackhpc-kayobe-config`
 1. `git checkout f31df6256f1b1fea99c84547d44f06c4cb74b161`
 1. `cd ..` and `mkdir venvs`
 1. `virtualenv venvs/kayobe` and source `venvs/kayobe/bin/activate`
@@ -35,7 +36,7 @@ conflicts, change to 4790)
 6. In etc/kayobe/environments/ci-multinode/tf-networks.yml,
    edit admin_ips so that the compute and controller IPs line up with the
    instances that were created earlier, remove the other IPs for seed and
-   cephOSD
+   cephOSD. If this file does not exist, copy the format of the example below
 7. In /etc/kayobe/environments/ci-multinode/network-allocation.yml, remove all
 the entries and just assign `aio_ips:` an empty set `[]`
 8. In etc/kayobe/environments/ci-multinode/inventory/hosts, remove the seed
@@ -73,3 +74,20 @@ manually increase the partition size on each host)
             vni: 523
 ```
 ### tf-networks.yml
+``` yaml
+---
+admin_cidr: 10.209.0.0/16
+admin_allocation_pool_start: 0.0.0.0
+admin_allocation_pool_end: 0.0.0.0
+admin_bootproto: dhcp
+admin_ips:
+  kayobe-compute-01: 10.209.2.79
+  kayobe-controller-01: 10.209.0.168
+  kayobe-controller-02: 10.209.0.36
+  kayobe-controller-03: 10.209.2.228
+```
+
+### network-allocation.yml
+``` yaml
+aio_ips: []
+```
