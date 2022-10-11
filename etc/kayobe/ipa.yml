@@ -5,7 +5,7 @@
 # Ironic Python Agent (IPA) image build configuration.
 
 # Whether to build IPA images from source.
-#ipa_build_images:
+ipa_build_images: True
 
 # URL of IPA source repository.
 #ipa_build_source_url:
@@ -26,7 +26,8 @@
 
 # List of additional Diskimage Builder (DIB) elements to use when building IPA
 # images. Default is none.
-#ipa_build_dib_elements_extra:
+ipa_build_dib_elements_extra:
+  - extra-hardware
 
 # List of Diskimage Builder (DIB) elements to use when building IPA images.
 # Default is combination of ipa_build_dib_elements_default and
@@ -39,7 +40,8 @@
 
 # Dictionary of additional environment variables to provide to Diskimage
 # Builder (DIB) during IPA image build.
-#ipa_build_dib_env_extra:
+ipa_build_dib_env_extra:
+  DIB_IPA_HARDWARE_PACKAGE: "git+https://github.com/stackhpc/hardware@disk-benchmarks-py36#egg=hardware"
 
 # Dictionary of environment variables to provide to Diskimage Builder (DIB)
 # during IPA image build.
@@ -108,7 +110,10 @@
 #ipa_collectors_default:
 
 # List of additional inspection collectors to run.
-#ipa_collectors_extra:
+ipa_collectors_extra:
+  - "dmi-decode"
+  - "extra-hardware"
+  - "numa-topology"
 
 # List of inspection collectors to run.
 #ipa_collectors:
