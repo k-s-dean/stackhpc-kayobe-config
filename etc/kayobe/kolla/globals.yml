@@ -2,3 +2,4 @@
 ---
 docker_yum_baseurl: "{{ stackhpc_repo_docker_url }}"
 docker_yum_gpgkey: "https://download.docker.com/linux/centos/gpg"
+
