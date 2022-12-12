@@ -31,3 +31,27 @@ Contents
    usage
    configuration/index
    contributor/index
+
+TODO
+====
+
+* kayobe-automation
+* CI workflows
+* Ansible config
+* ADVise
+* Compute management playbooks
+* RabbitMQ reset
+* Swap
+* Downstream forks
+* Release notes
+* Pulp container
+* Squid container
+* Package repos
+* Live restore
+* Kolla images
+* LVM config
+* Overcloud DIB
+* Enabled services
+* Dashboards
+* Prometheus rules
+* More release train
