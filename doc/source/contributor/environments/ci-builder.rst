@@ -39,8 +39,8 @@ Clone the Kayobe and Kayobe configuration repositories (this one):
    cd
    mkdir -p src
    pushd src
-   git clone https://github.com/stackhpc/kayobe.git -b stackhpc/xena
-   git clone https://github.com/stackhpc/stackhpc-kayobe-config -b stackhpc/xena kayobe-config
+   git clone https://github.com/stackhpc/kayobe.git -b |current_series_git_branch_name|
+   git clone https://github.com/stackhpc/stackhpc-kayobe-config -b |current_series_git_branch_name| kayobe-config
    popd
 
 Create a virtual environment and install Kayobe:
