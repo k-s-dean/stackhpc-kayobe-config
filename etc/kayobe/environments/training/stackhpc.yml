@@ -1,0 +1,24 @@
+---
+###############################################################################
+# Kolla configuration.
+#
+# Docker namespace to use for Kolla images. Default is 'kolla'.
+kolla_docker_namespace: stackhpc-dev
+
+# Whether docker should be configured to use an insecure registry for Kolla
+# images. Default is false, unless docker_registry_enabled is true and
+# docker_registry_enable_tls is false.
+kolla_docker_registry_insecure: "{{ 'https' not in stackhpc_repo_mirror_url }}"
+
+###############################################################################
+# StackHPC configuration.
+
+# Base URL of the StackHPC Test Pulp service.
+stackhpc_release_pulp_url: "http://pulp-server.internal.sms-cloud:8080"
+
+# No client certs required to access Test Pulp.
+stackhpc_release_pulp_client_cert:
+stackhpc_release_pulp_client_key:
+
+pulp_username: admin
+pulp_password: 9e4bfa04-9d9d-493d-9473-ba92e4361dae
