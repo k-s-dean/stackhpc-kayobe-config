@@ -1,13 +1,13 @@
+
 ---
 ###############################################################################
-# Network interface definitions for the compute group.
+# Network interface definitions for the seed group.
 
-# Controller interface on all-in-one network.
-aio_interface: "br{{ aio_bridge_ports[0] }}"
-aio_bridge_ports:
-  - "{{ 'ens2' if os_distribution == 'ubuntu' else 'eth0' }}"
+aio_interface: "{{ 'ens2' if os_distribution == 'ubuntu' else 'eth0' }}"
 
 # Route via the seed-hypervisor to the outside world.
+# FIXME: Circular reference between seed & seed-hypervisor?
+#aio_gateway: "{{ 'aio' | net_ip('localhost') }}"
 aio_gateway: 192.168.33.4
 
 ###############################################################################
