@@ -15,8 +15,8 @@ KAYOBE_CONFIG_BRANCH=training-env
 KAYOBE_ENVIRONMENT=training
 
 PELICAN_HOST="10.0.0.34 pelican pelican.service.compute.sms-lab.cloud"
-# PULP_HOST="10.205.3.187 pulp-server pulp-server.internal.sms-cloud"
-PULP_HOST="10.209.0.207 pulp-server pulp-server.internal.sms-cloud" #Use Mark's router workaround
+PULP_HOST="10.205.3.187 pulp-server pulp-server.internal.sms-cloud"
+# PULP_HOST="10.209.0.207 pulp-server pulp-server.internal.sms-cloud" #Use Mark's router workaround
 
 # FIXME: Work around lack of DNS on SMS lab.
 cat << EOF | sudo tee -a /etc/hosts
@@ -136,9 +136,9 @@ kayobe overcloud host configure
 # kayobe playbook run $KAYOBE_CONFIG_PATH/ansible/cephadm-gather-keys.yml
 kayobe overcloud container image pull
 kayobe overcloud service deploy
-source $KOLLA_CONFIG_PATH/public-openrc.sh
+source $KOLLA_CONFIG_PATH/admin-openrc.sh
 kayobe overcloud post configure
-source $KOLLA_CONFIG_PATH/public-openrc.sh
+source $KOLLA_CONFIG_PATH/admin-openrc.sh
 
 
 # Use Jack's openstack-config-multinode here instead of init-runonce.sh
@@ -158,7 +158,7 @@ fi
 source $VENV_DIR/bin/activate
 pip install -U pip
 pip install python-openstackclient
-source $KOLLA_CONFIG_PATH/public-openrc.sh
+source $KOLLA_CONFIG_PATH/admin-openrc.sh
 echo "Creating openstack key:"
 openstack keypair create --private-key ~/.ssh/id_rsa mykey
 echo "Creating test vm:"
