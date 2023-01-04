@@ -4,7 +4,7 @@
 
 node_types:
   controller:
-    memory_mb: 4096
+    memory_mb: 10240
     vcpus: 2
     volumes:
       # There is a minimum disk space capacity requirement of 4GiB when using Ironic Python Agent:
