@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an Internal Server Error in CloudKitty triggered by ``cloudkitty
+    --os-rating-api-version 2 dataframes get`` when using the Elasticsearch
+    storage backend.

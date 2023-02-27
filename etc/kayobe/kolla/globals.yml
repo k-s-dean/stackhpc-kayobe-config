@@ -9,9 +9,11 @@ enable_docker_repo: {% raw %}"{{ 'overcloud' not in group_names or ansible_facts
 
 {% if kolla_base_distro == 'centos' %}
 bifrost_tag: yoga-20230217T160618
+cloudkitty_tag: yoga-20230227T104725
 neutron_tag: yoga-20230222T141329
 {% else %}
 bifrost_tag: yoga-20230220T184947
+cloudkitty_tag: yoga-20230227T105840
 neutron_tag: yoga-20230222T151000
 {% endif %}
 
